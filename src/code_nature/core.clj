@@ -20,6 +20,10 @@
     :draw draw
     :middleware [m/fun-mode]))
 
+(defn lookup-sketch
+  [ns name]
+  (eval (symbol (str "code-nature." ns) name)))
+
 (defn setup []
   ; Set frame rate to 30 frames per second.
   (q/frame-rate 30)
@@ -53,6 +57,19 @@
 (def test-sketch
   (create-sketch "You spin my circle" setup update-state draw-state))
 
+(defn random 
+  ([max] (rand max))
+  ([min max] (+ min (rand (- max min)))))
+
+(defn -main
+  "Main method, executes the specified sketch
+   USAGE: lein run intro exec1"
+  [& args]
+  (let [[ns name] args]
+    (if (= 2 (count args)) 
+     (start-sketch (lookup-sketch ns name))
+     (throw (IllegalArgumentException. "USAGE: lein run intro exec1")))))
+
 #_(q/defsketch code-nature
   :title "You spin my circle right round"
   :size [500 500]
@@ -65,3 +82,4 @@
   ; Check quil wiki for more info about middlewares and particularly
   ; fun-mode.
   :middleware [m/fun-mode])
+

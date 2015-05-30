@@ -3,10 +3,17 @@
   (:require [code-nature.core :as core]
             [quil.core :as q]))
 
-(defn exec1-setup []
+;; Define a walker that start at the center of the sketch
+(defn walker-setup []
   (q/frame-rate 30)
   {:x (/ (q/width) 2)
    :y (/ (q/height) 2)})
+
+;; Drawer function that just print a point of the position of the walker
+(defn walker-draw
+  [state]
+  (q/stroke 0)
+  (q/point (:x state) (:y state)))
 
 (defn exec1-update 
   [state]
@@ -17,13 +24,21 @@
      (= choise 2) {:x (:x state) :y (inc (:y state))}
      :else {:x (:x state) :y (dec (:y state))})))
 
-(defn exec1-draw
+(defn exec2-update
   [state]
-  (q/stroke 0)
-  (q/point (:x state) (:y state)))
+  (let [dx (core/random -1 1)
+        dy (core/random -1 1)]
+    {:x (+ dx (:x state))
+     :y (+ dy (:y state))}))
 
 (def exec1 (core/create-sketch
             "Exec1. Random Walker"
-            exec1-setup
+            walker-setup
             exec1-update
-            exec1-draw))
+            walker-draw))
+
+(def exec2 (core/create-sketch
+            "Exec2. Random Walker"
+            walker-setup
+            exec2-update
+            walker-draw))
