@@ -21,8 +21,13 @@
     :middleware [m/fun-mode]))
 
 (defn lookup-sketch
+  "Looks up a sketch based on it name, and namespace.
+  ns: intro (for code-nature.intro)
+  name: exec1 (for code-nature.intro/exec1)"
   [ns name]
-  (eval (symbol (str "code-nature." ns) name)))
+  (let [namespace (str "code-nature." ns)]
+    (require (symbol namespace))
+    (eval (symbol namespace name))))
 
 (defn setup []
   ; Set frame rate to 30 frames per second.
@@ -58,6 +63,7 @@
   (create-sketch "You spin my circle" setup update-state draw-state))
 
 (defn random 
+  ([] (rand))
   ([max] (rand max))
   ([min max] (+ min (rand (- max min)))))
 

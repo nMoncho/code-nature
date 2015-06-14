@@ -42,3 +42,76 @@
             walker-setup
             exec2-update
             walker-draw))
+
+(defn -exam3-distro
+  [rnd]
+  (cond
+   (< rnd 0.4) {:key :x :fun inc}
+   (< rnd 0.6) {:key :x :fun dec}
+   (< rnd 0.8) {:key :y :fun inc}
+   :else {:key :y :fun dec}))
+
+(defn exam3-update
+  [state]
+  (let [rnd (core/random)
+        {key :key fun :fun} (-exam3-distro rnd)]
+    (update-in state [key] fun)))
+
+(def exam3 (core/create-sketch
+            "Example 2. Walker that tends to move to the right"
+            walker-setup
+            exam3-update
+            walker-draw))
+(defn -exec3-goto-mouse
+  [state mx my]
+  (let [{x :x y :y} state
+        dx (- mx x)
+        dy (- my y)
+        dx (/ dx (Math/abs dx))
+        dy (/ dy (Math/abs dy))]
+    {:x (+ x dx) :y (+ y dy)}))
+
+(defn exec3-update
+  [state]
+  (let [mx (q/mouse-x)
+        my (q/mouse-y)
+        rnd (core/random)]
+    (cond
+     (< rnd 0.5) (-exec3-goto-mouse state mx my)
+     :else (exec2-update state))))
+
+(def exec3 (core/create-sketch
+            "Create a random walker with dynamic probabilities. 50% chance of moving in the direction of the mouse"
+            walker-setup
+            exec3-update
+            walker-draw))
+
+(defn rnd-distro-setup []
+  (q/frame-rate 30)
+  {:randomCounts (apply vector(take 20 (repeat 0)))})
+
+(defn rnd-distro-update 
+  [state]
+  (let [rnd-size (count (:randomCounts state))
+        idx (int (core/random rnd-size))]
+    (update-in state [:randomCounts idx] inc)))
+
+(defn rnd-distro-draw
+  [state]
+  (q/background 255)
+  (q/stroke 0)
+  (q/fill 175)
+  (let [{randoms :randomCounts} state
+        randoms (map-indexed vector randoms)
+        w (/ (q/width) (count randoms))
+        height (q/height)]
+    (doseq [rnd randoms]
+      (let [idx (first rnd)
+            val (last rnd)] 
+        (q/rect (* idx w) (- height val) w val)))))
+
+(def exam1 (core/create-sketch
+              "Random number distribution"
+              rnd-distro-setup
+              rnd-distro-update
+              rnd-distro-draw))
